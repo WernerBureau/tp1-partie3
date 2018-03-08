@@ -1,0 +1,6 @@
+Werner Burat:
+Méthodes: validerCommandes,
+
+
+Mathieu Allard:
+Méthodes: 
