@@ -1,6 +1,15 @@
 Werner Burat:
-Méthodes: validerCommandes,
-
+Fonctionalités: 
+-Valider une commande (validerCommande)
+Réusinage:
+-Mettre la lecture du fichier dans une méthode.
+-Ajouter une variable String à l'objet Commande qui spécifie s'il y a une erreur.
 
 Mathieu Allard:
-Méthodes: afficherCommandes, ecrireCommandes
+Fonctionalités: 
+-Afficher les commandes (afficherCommandes)
+-Permettre d'ecrire les commandes (ecrireCommandes)
+
+
+Réusinage du code de la partie 2 à la partie 3:
+-Package "partie2" renommé "partie3"
