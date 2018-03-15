@@ -3,6 +3,7 @@ Méthode 1: afficherCommandes
 Cette méthode fait l'affichage des commandes dans le terminal.
 -Les commandes incorrectes sont affichées avant les factures.
   -Les commandes incorrectes comportent les détails de la commande et la raison de l'erreur.
+ -Si un client a une facture de 0$, elle n'est pas écrite.
  -Les taxes sont appliquées (TPS 5%, TVQ 10%)
   
 
