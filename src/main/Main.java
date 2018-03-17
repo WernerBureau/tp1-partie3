@@ -1,4 +1,4 @@
-package partie2;
+package main;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -21,10 +21,6 @@ public class Main {
 
 		String nomFichier = "entree.txt";
 		String ligne = null;
-
-		Client client;
-		Plat plat;
-		Commande commande;
 
 		String[] lignes = new String[30];
 		String[] texte;
@@ -66,58 +62,19 @@ public class Main {
 			}
 
 			// Clients
-			for (int i = 1; i < i2 - i1; i++) {
-				client = new Client(lignes[i]);
-				clients.add(client);
-				commande = new Commande(client);
-				commandes.add(commande);
-			}
+			ajoutClients(lignes, i1, i2);
 
 			// Plats
-			for (int i = 1; i < i3 - i2; i++) {
-				String[] platSplit = lignes[i2 + i].split(" ");
-				plat = new Plat(platSplit[0], Double.parseDouble(platSplit[1]));
-				plats.add(plat);
-
-			}
+			ajoutPlats(lignes, i2, i3);
 
 			// Commandes
-			for (int i = 1; i < i4 - i3; i++) {
-				
-				String[] commandesSplit = lignes[i3 + i].split(" ");
-				client = new Client(commandesSplit[0]);
-				int quantite = Integer.parseInt(commandesSplit[2]);
-				if (!clientExiste(commandesSplit[0])) {
-					System.out.println("Le fichier ne respecte pas le format demandé !");
-				}
-				if (!platExiste(commandesSplit[1])) {
-					System.out.println("Le fichier ne respecte pas le format demandé !");
-				}
-				
-				
-				for (Commande com : commandes) {
-					if (com.getClient().getNom().equals(client.getNom())) {
-
-						for (Plat pl : plats) {
-							if (pl.getNom().equals(commandesSplit[1]))
-								com.ajouterPlat(pl,
-										quantite);
-						}
-
-					}
-					
-				}
-
-			}
+			ajoutCommandes(lignes, i3, i4);
 
 			FileWriter ecriveurFichier = new FileWriter("sortie.txt");
 			BufferedWriter ecriveurBuff = new BufferedWriter(ecriveurFichier);
 
-			ecriveurBuff.write("Bienvenue chez Barette!\r\nFactures:");
-			for (Commande com : commandes) {
-
-				ecriveurBuff.write("\r\n" + com);
-			}
+			ecritureFichier(ecriveurBuff);
+			
 			ecriveurBuff.flush();
 			ecriveurBuff.close();
 			liseurFichier.close();
@@ -131,6 +88,67 @@ public class Main {
 					+ nomFichier + "'");
 		} catch (ArrayIndexOutOfBoundsException ex){
 			System.out.println("Le fichier ne respecte pas le format demandé !");
+		}
+	}
+
+	private static void ecritureFichier(BufferedWriter ecriveurBuff)
+			throws IOException {
+		ecriveurBuff.write("Bienvenue chez Barette!\r\nFactures:");
+		for (Commande com : commandes) {
+
+			ecriveurBuff.write("\r\n" + com);
+		}
+	}
+
+	private static void ajoutCommandes(String[] lignes, int i3, int i4) {
+		Client client;
+		for (int i = 1; i < i4 - i3; i++) {
+			
+			String[] commandesSplit = lignes[i3 + i].split(" ");
+			client = new Client(commandesSplit[0]);
+			int quantite = Integer.parseInt(commandesSplit[2]);
+			if (!clientExiste(commandesSplit[0])) {
+				System.out.println("Le fichier ne respecte pas le format demandé !");
+			}
+			if (!platExiste(commandesSplit[1])) {
+				System.out.println("Le fichier ne respecte pas le format demandé !");
+			}
+			
+			
+			for (Commande com : commandes) {
+				if (com.getClient().getNom().equals(client.getNom())) {
+
+					for (Plat pl : plats) {
+						if (pl.getNom().equals(commandesSplit[1]))
+							com.ajouterPlat(pl,
+									quantite);
+					}
+
+				}
+				
+			}
+
+		}
+	}
+
+	private static void ajoutPlats(String[] lignes, int i2, int i3) {
+		Plat plat;
+		for (int i = 1; i < i3 - i2; i++) {
+			String[] platSplit = lignes[i2 + i].split(" ");
+			plat = new Plat(platSplit[0], Double.parseDouble(platSplit[1]));
+			plats.add(plat);
+
+		}
+	}
+
+	private static void ajoutClients(String[] lignes, int i1, int i2) {
+		Client client;
+		Commande commande;
+		for (int i = 1; i < i2 - i1; i++) {
+			client = new Client(lignes[i]);
+			clients.add(client);
+			commande = new Commande(client);
+			commandes.add(commande);
 		}
 	}
 	

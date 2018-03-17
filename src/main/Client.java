@@ -1,4 +1,4 @@
-package partie2;
+package main;
 
 public class Client {
 	private String nom;
