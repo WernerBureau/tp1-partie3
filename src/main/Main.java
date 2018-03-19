@@ -8,19 +8,15 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 
-import com.sun.javafx.css.CalculatedValue;
-
 public class Main {
 
-	
 	static ArrayList<Client> clients = new ArrayList<Client>();
 	static ArrayList<Plat> plats = new ArrayList<Plat>();
 	static ArrayList<Commande> commandes = new ArrayList<Commande>();
-	
+
 	public static void main(String[] args) throws IOException {
 
 		// Lecture du fichier entree.txt
-
 		String nomFichier = "entree.txt";
 		String ligne = null;
 
@@ -70,13 +66,16 @@ public class Main {
 			ajoutPlats(lignes, i2, i3);
 
 			// Commandes
-			ajoutCommandes(lignes, i3, i4);
+			construireCommandes(lignes, i3, i4);
 
 			FileWriter ecriveurFichier = new FileWriter("sortie.txt");
 			BufferedWriter ecriveurBuff = new BufferedWriter(ecriveurFichier);
 
+			// Affichage des commandes
+			afficherCommandes();
+
 			ecritureFichier(ecriveurBuff);
-			
+
 			ecriveurBuff.flush();
 			ecriveurBuff.close();
 			liseurFichier.close();
@@ -88,8 +87,9 @@ public class Main {
 		} catch (IOException ex) {
 			System.out.println("Erreur lors de la lecture du fichier '"
 					+ nomFichier + "'");
-		} catch (ArrayIndexOutOfBoundsException ex){
-			System.out.println("Le fichier ne respecte pas le format demandé !");
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			System.out
+					.println("Le fichier ne respecte pas le format demandé !");
 		}
 	}
 
@@ -99,35 +99,41 @@ public class Main {
 		ecrireCommandes(ecriveurBuff);
 	}
 
-	private static void ajoutCommandes(String[] lignes, int i3, int i4) {
+	private static void construireCommandes(String[] lignes, int i3, int i4) {
 		Client client;
 		for (int i = 1; i < i4 - i3; i++) {
-			
+
 			String[] commandesSplit = lignes[i3 + i].split(" ");
 			client = new Client(commandesSplit[0]);
 			int quantite = Integer.parseInt(commandesSplit[2]);
-			if (!clientExiste(commandesSplit[0])) {
-				System.out.println("Le fichier ne respecte pas le format demandé !");
-			}
-			if (!platExiste(commandesSplit[1])) {
-				System.out.println("Le fichier ne respecte pas le format demandé !");
-			}
+
+			validerCommande(commandesSplit);
 			
-			
+			// Attribuer un client à la commande
 			for (Commande com : commandes) {
 				if (com.getClient().getNom().equals(client.getNom())) {
-
+					// Attribuer des plats à la commande
 					for (Plat pl : plats) {
 						if (pl.getNom().equals(commandesSplit[1]))
-							com.ajouterPlat(pl,
-									quantite);
+							com.ajouterPlat(pl, quantite);
 					}
 
 				}
-				
+
 			}
 
 		}
+	}
+
+	public static boolean validerCommande(String[] commandesSplit) {
+		boolean valide = true;
+		if (!clientExiste(commandesSplit[0])) {
+			valide = false;
+		}
+		if (!platExiste(commandesSplit[1])) {
+			valide = false;
+		}
+		return valide;
 	}
 
 	private static void ajoutPlats(String[] lignes, int i2, int i3) {
@@ -150,57 +156,58 @@ public class Main {
 			commandes.add(commande);
 		}
 	}
-	
-	public static boolean clientExiste(String nom){
-		
-		boolean b =false;
+
+	public static boolean clientExiste(String nom) {
+
+		boolean b = false;
 		for (Client cli : clients) {
 			if (cli.getNom().equals(nom)) {
-				b=true;
+				b = true;
 			}
 		}
-		
+
 		return b;
-		
+
 	}
-	
-	public static boolean platExiste(String nom){
-		
-		boolean b =false;
+
+	public static boolean platExiste(String nom) {
+
+		boolean b = false;
 		for (Plat plat : plats) {
 			if (plat.getNom().equals(nom)) {
-				b=true;
+				b = true;
 			}
 		}
-		
+
 		return b;
-		
+
 	}
-	
-	private static String genererSortie(){
+
+	private static String genererSortie() {
 		String afficher = "";
 		for (Commande commande : commandes) {
+			commande.setErreur("");
 			if (!commande.getErreur().equals("")) {
 				afficher += commande + "\r\n";
 			}
 		}
-		
+
 		for (Commande commande : commandes) {
-			if (commande.getErreur().equals("") && commande.calculerPrixTotal() != 0) {
+			if (commande.getErreur().equals("")
+					&& commande.calculerPrixTotal() != 0) {
 				afficher += commande + "\r\n";
 			}
 		}
 		return afficher;
 	}
-	
-	private void afficherCommandes(){
+
+	public static void afficherCommandes() {
 		System.out.println(genererSortie());
 	}
-	
+
 	private static void ecrireCommandes(BufferedWriter ecriveurBuff)
 			throws IOException {
 		ecriveurBuff.write(genererSortie());
 	}
-	
-	
+
 }
