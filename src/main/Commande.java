@@ -6,6 +6,7 @@ public class Commande {
 
 	private Client client;
 	private ArrayList<Plat> plats = new ArrayList<Plat>();
+	private String erreur;
 
 	public Commande(Client client) {
 		this.client = client;
@@ -17,18 +18,38 @@ public class Commande {
 			plats.add(plat);
 		}
 	}
-
-	public String toString() {
+	
+	public double calculerPrixTotal(){
 		double prixTotal = 0;
 		for (Plat plat : plats) {
 			prixTotal += plat.getPrix();
 		}
-		return client.getNom() + " " + String.format("%.2f", prixTotal) + "$";
+		prixTotal += prixTotal*15/100;
+		return prixTotal;
+	}
+
+	public String toString() {
+		String s;
+		if (getErreur().equals("")) {
+			s = client.getNom() + " : " + String.format("%.2f", calculerPrixTotal()) + "$";
+		}else {
+			s = "Commande incorrecte : " + client.getNom() + ", " + getErreur();
+		}
+		return s;
 	}
 
 	public Client getClient() {
 
 		return this.client;
+	}
+	
+
+	public String getErreur() {
+		return erreur;
+	}
+
+	public void setErreur(String erreur) {
+		this.erreur = erreur;
 	}
 
 }

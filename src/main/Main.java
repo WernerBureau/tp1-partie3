@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 import java.util.ArrayList;
 
+import com.sun.javafx.css.CalculatedValue;
+
 public class Main {
 
 	
@@ -94,10 +96,7 @@ public class Main {
 	private static void ecritureFichier(BufferedWriter ecriveurBuff)
 			throws IOException {
 		ecriveurBuff.write("Bienvenue chez Barette!\r\nFactures:");
-		for (Commande com : commandes) {
-
-			ecriveurBuff.write("\r\n" + com);
-		}
+		ecrireCommandes(ecriveurBuff);
 	}
 
 	private static void ajoutCommandes(String[] lignes, int i3, int i4) {
@@ -177,4 +176,31 @@ public class Main {
 		return b;
 		
 	}
+	
+	private static String genererSortie(){
+		String afficher = "";
+		for (Commande commande : commandes) {
+			if (!commande.getErreur().equals("")) {
+				afficher += commande + "\r\n";
+			}
+		}
+		
+		for (Commande commande : commandes) {
+			if (commande.getErreur().equals("") && commande.calculerPrixTotal() != 0) {
+				afficher += commande + "\r\n";
+			}
+		}
+		return afficher;
+	}
+	
+	private void afficherCommandes(){
+		System.out.println(genererSortie());
+	}
+	
+	private static void ecrireCommandes(BufferedWriter ecriveurBuff)
+			throws IOException {
+		ecriveurBuff.write(genererSortie());
+	}
+	
+	
 }
