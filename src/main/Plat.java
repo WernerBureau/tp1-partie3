@@ -1,12 +1,17 @@
 package main;
 
-public class Plat {
-	private String nomPlat;
-	private double prix;
+import java.util.ArrayList;
 
-	public Plat(String nomPlat, double prix) {
-		this.nomPlat = nomPlat;
+public class Plat {
+	private String nom;
+	private double prix;
+	
+	static ArrayList<Plat> listePlats = new ArrayList<Plat>();
+
+	public Plat(String nom, double prix) {
+		this.nom = nom;
 		this.prix = prix;
+		listePlats.add(this);
 	}
 
 	public double getPrix() {
@@ -14,6 +19,21 @@ public class Plat {
 	}
 
 	public String getNom() {
-		return nomPlat;
+		return nom;
+	}
+	
+	static int chercherPlat(String nom){
+		int index = -1;
+		for (int i = 0; i < listePlats.size(); i++) {
+			if (listePlats.get(i).getNom().equals(nom)) {
+				index = i;
+				break;
+			}
+		}
+		return index;
+	}
+	
+	static Plat getPlat(int index){
+		return listePlats.get(index);
 	}
 }

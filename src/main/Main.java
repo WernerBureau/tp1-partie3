@@ -6,28 +6,29 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.util.ArrayList;
-
-import com.sun.javafx.css.CalculatedValue;
 
 public class Main {
 
-	
-	static ArrayList<Client> clients = new ArrayList<Client>();
-	static ArrayList<Plat> plats = new ArrayList<Plat>();
-	static ArrayList<Commande> commandes = new ArrayList<Commande>();
-	
+	static String nomFichier = "entree.txt";
+	static String sortie;
+
 	public static void main(String[] args) throws IOException {
 
 		// Lecture du fichier entree.txt
+		lireFichier(nomFichier);
 
-		String nomFichier = "entree.txt";
+	}
+
+	private static void lireFichier(String entree) {
+
 		String ligne = null;
 
 		String[] lignes = new String[30];
 		String[] texte;
 
 		try {
+
+			sortie = "";
 			FileReader liseurFichier = new FileReader(nomFichier);
 			BufferedReader liseurBuff = new BufferedReader(liseurFichier);
 
@@ -64,19 +65,22 @@ public class Main {
 			}
 
 			// Clients
-			ajoutClients(lignes, i1, i2);
+			lireClients(lignes, i1, i2);
 
 			// Plats
-			ajoutPlats(lignes, i2, i3);
+			lirePlats(lignes, i2, i3);
 
 			// Commandes
-			ajoutCommandes(lignes, i3, i4);
+			lireCommandes(lignes, i3, i4);
+			
+			ecrireSortie();
+			afficherSortie();
 
 			FileWriter ecriveurFichier = new FileWriter("sortie.txt");
 			BufferedWriter ecriveurBuff = new BufferedWriter(ecriveurFichier);
 
-			ecritureFichier(ecriveurBuff);
-			
+			ecrireFichierSortie(ecriveurBuff);
+
 			ecriveurBuff.flush();
 			ecriveurBuff.close();
 			liseurFichier.close();
@@ -88,119 +92,141 @@ public class Main {
 		} catch (IOException ex) {
 			System.out.println("Erreur lors de la lecture du fichier '"
 					+ nomFichier + "'");
-		} catch (ArrayIndexOutOfBoundsException ex){
-			System.out.println("Le fichier ne respecte pas le format demandé !");
+		} catch (ArrayIndexOutOfBoundsException ex) {
+			System.out
+					.println("Le fichier ne respecte pas le format demandé !");
 		}
 	}
 
-	private static void ecritureFichier(BufferedWriter ecriveurBuff)
-			throws IOException {
-		ecriveurBuff.write("Bienvenue chez Barette!\r\nFactures:");
-		ecrireCommandes(ecriveurBuff);
-	}
 
-	private static void ajoutCommandes(String[] lignes, int i3, int i4) {
-		Client client;
+	private static void lireCommandes(String[] lignes, int i3, int i4) {
 		for (int i = 1; i < i4 - i3; i++) {
-			
-			String[] commandesSplit = lignes[i3 + i].split(" ");
-			client = new Client(commandesSplit[0]);
-			int quantite = Integer.parseInt(commandesSplit[2]);
-			if (!clientExiste(commandesSplit[0])) {
-				System.out.println("Le fichier ne respecte pas le format demandé !");
-			}
-			if (!platExiste(commandesSplit[1])) {
-				System.out.println("Le fichier ne respecte pas le format demandé !");
-			}
-			
-			
-			for (Commande com : commandes) {
-				if (com.getClient().getNom().equals(client.getNom())) {
-
-					for (Plat pl : plats) {
-						if (pl.getNom().equals(commandesSplit[1]))
-							com.ajouterPlat(pl,
-									quantite);
-					}
-
-				}
-				
-			}
-
+			lireLigneCommande(lignes[i3 + i]);
 		}
 	}
 
-	private static void ajoutPlats(String[] lignes, int i2, int i3) {
-		Plat plat;
+	private static void lirePlats(String[] lignes, int i2, int i3) {
 		for (int i = 1; i < i3 - i2; i++) {
-			String[] platSplit = lignes[i2 + i].split(" ");
-			plat = new Plat(platSplit[0], Double.parseDouble(platSplit[1]));
-			plats.add(plat);
+			lireLignePlat(lignes[i2 + i]);
 
 		}
 	}
 
-	private static void ajoutClients(String[] lignes, int i1, int i2) {
-		Client client;
-		Commande commande;
+	private static void lireClients(String[] lignes, int i1, int i2) {
 		for (int i = 1; i < i2 - i1; i++) {
-			client = new Client(lignes[i]);
-			clients.add(client);
-			commande = new Commande(client);
-			commandes.add(commande);
+			lireLigneClient(lignes[i]);
 		}
 	}
-	
-	public static boolean clientExiste(String nom){
+
+	private static void lireLigneClient(String ligne) {
 		
-		boolean b =false;
-		for (Client cli : clients) {
-			if (cli.getNom().equals(nom)) {
-				b=true;
+		
+		boolean clientExisteDeja = true;
+		try {
+			clientExisteDeja = Client.chercherClient(ligne) >= 0;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			sortie += "Erreur avec la ligne " + ligne
+					+ "\r\nLe format de la ligne n'est pas respecté\r\n";
+		}
+
+		if (ligne.contains(" ") || clientExisteDeja) {
+			// Il y a une espace
+			sortie += "Erreur avec la ligne " + ligne + "\r\n";
+			sortie += ligne.contains(" ") ? "\tLa ligne contient plus qu'un nom\r\n" : "";
+			sortie += clientExisteDeja ? "\tLe client existe déjà.\r\n" : "";
+			
+		}else {
+			new Client(ligne);
+		}
+
+	}
+
+	private static void lireLignePlat(String ligne) {
+		String[] platSplit = ligne.split(" ");
+		if (platSplit.length != 2) {
+			sortie += "Erreur avec la ligne " + ligne
+					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+		}
+		boolean platExisteDeja = false, prixValide = false;
+		double prix = 0;
+		try {
+
+			platExisteDeja = (Plat.chercherPlat(platSplit[0]) >= 0);
+			try {
+				prix = Double.parseDouble(platSplit[1]);
+				prixValide = true;
+			} catch (NumberFormatException ex) {
+				prixValide = false;
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
-		
-		return b;
-		
+
+		if (platExisteDeja || !prixValide) {
+			// Il y a au moins une erreur;
+			sortie += "Erreur avec la ligne " + ligne + "\r\n";
+			sortie += platExisteDeja ? "\tLe plat existe déjà\r\n" : "";
+			sortie += !prixValide ? "\tLe prix n'est pas valide\r\n" : "";
+		} else {
+			// Aucune erreur, ajouter la commande
+			new Plat(platSplit[0], prix);
+		}
+
 	}
-	
-	public static boolean platExiste(String nom){
-		
-		boolean b =false;
-		for (Plat plat : plats) {
-			if (plat.getNom().equals(nom)) {
-				b=true;
+
+	private static void lireLigneCommande(String ligne) {
+		String[] commandesSplit = ligne.split(" ");
+		if (commandesSplit.length != 3) {
+			sortie += "Erreur avec la ligne " + ligne
+					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+		}
+
+		boolean clientExiste = false, platExiste = false, quantiteValide = false;
+		int quantite = 0, indexClient = 0, indexPlat = 0;
+
+		try {
+			indexClient = Client.chercherClient(commandesSplit[0]);
+			indexPlat = Plat.chercherPlat(commandesSplit[1]);
+			clientExiste = (indexClient >= 0);
+			platExiste = (indexPlat >= 0);
+
+			try {
+				quantite = Integer.parseInt(commandesSplit[2]);
+				quantiteValide = true;
+			} catch (NumberFormatException ex) {
+				quantiteValide = false;
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			sortie += "Erreur avec la ligne " + ligne
+					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
 		}
-		
-		return b;
-		
+
+		if (!clientExiste || !platExiste || !quantiteValide) {
+			// Il y a au moins une erreur;
+			sortie += "Erreur avec la ligne \"" + ligne + "\"\r\n";
+			sortie += !clientExiste ? "\tLe client n'existe pas\r\n" : "";
+			sortie += !platExiste ? "\tLe plat n'existe pas\r\n" : "";
+			sortie += !quantiteValide ? "\tLa quantité n'est pas valide\r\n"
+					: "";
+		} else {
+			// Aucune erreur, ajouter la commande
+			Commande com = new Commande(Plat.getPlat(indexPlat), quantite);
+			Client.getClient(indexClient).ajouterCommande(com);
+		}
+
 	}
 	
-	private static String genererSortie(){
-		String afficher = "";
-		for (Commande commande : commandes) {
-			if (!commande.getErreur().equals("")) {
-				afficher += commande + "\r\n";
-			}
-		}
-		
-		for (Commande commande : commandes) {
-			if (commande.getErreur().equals("") && commande.calculerPrixTotal() != 0) {
-				afficher += commande + "\r\n";
-			}
-		}
-		return afficher;
+	// Écrit les commandes correctes dans le string sortie
+	private static void ecrireSortie(){
+		sortie+="\r\n-------------------\r\n\r\nBienvenue chez Barette!\r\nFactures:\r\n" + Client.compilerFactures();
 	}
-	
-	private void afficherCommandes(){
-		System.out.println(genererSortie());
+
+	private static void afficherSortie() {
+		System.out.println(sortie);
 	}
-	
-	private static void ecrireCommandes(BufferedWriter ecriveurBuff)
+
+	private static void ecrireFichierSortie(BufferedWriter ecriveurBuff)
 			throws IOException {
-		ecriveurBuff.write(genererSortie());
+		ecriveurBuff.write(sortie);
 	}
-	
-	
+
 }
