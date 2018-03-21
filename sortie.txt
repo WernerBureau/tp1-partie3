@@ -1,0 +1,12 @@
+Erreur avec la ligne Coke coke j'aime le coke 15
+	Le format de la ligne n'est pas respecté
+Erreur avec la ligne Coke coke j'aime le coke 15
+	Le prix n'est pas valide
+
+-------------------
+
+Bienvenue chez Barette!
+Factures:
+Roger : 12.08 $
+Céline : 23.86 $
+Steeve : 0.00 $
