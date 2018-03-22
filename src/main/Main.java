@@ -74,16 +74,19 @@ public class Main {
 
 			// Commandes
 			lireCommandes(lignes, i3, i4);
-			
+
 			ecrireSortie();
 			afficherSortie();
 			String nomFichierSortie = "Facture-du-";
 			Calendar cal = Calendar.getInstance();
-		   
-		    
-		    nomFichierSortie +=  new SimpleDateFormat("dd-MMM-HH").format(cal.getTime()) + 'h' + new SimpleDateFormat("mm").format(cal.getTime());
-		    
-			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie + ".txt");
+
+			nomFichierSortie += new SimpleDateFormat("dd-MMM-HH").format(cal
+					.getTime())
+					+ 'h'
+					+ new SimpleDateFormat("mm").format(cal.getTime());
+
+			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie
+					+ ".txt");
 			BufferedWriter ecriveurBuff = new BufferedWriter(ecriveurFichier);
 
 			ecrireFichierSortie(ecriveurBuff);
@@ -105,53 +108,49 @@ public class Main {
 		}
 	}
 
-
 	private static void lireCommandes(String[] lignes, int i3, int i4) {
 		for (int i = 1; i < i4 - i3; i++) {
-			lireLigneCommande(lignes[i3 + i]);
+			sortie += lireLigneCommande(lignes[i3 + i]);
 		}
 	}
 
 	private static void lirePlats(String[] lignes, int i2, int i3) {
 		for (int i = 1; i < i3 - i2; i++) {
-			lireLignePlat(lignes[i2 + i]);
+			sortie += lireLignePlat(lignes[i2 + i]);
 
 		}
 	}
 
 	private static void lireClients(String[] lignes, int i1, int i2) {
 		for (int i = 1; i < i2 - i1; i++) {
-			lireLigneClient(lignes[i]);
+			sortie += lireLigneClient(lignes[i]);
 		}
 	}
 
-	private static void lireLigneClient(String ligne) {
-		
-		
+	public static String lireLigneClient(String ligne) {
+
+		String s = "";
 		boolean clientExisteDeja = true;
-		try {
-			clientExisteDeja = Client.chercherClient(ligne) >= 0;
-		} catch (ArrayIndexOutOfBoundsException e) {
-			sortie += "Erreur avec la ligne " + ligne
-					+ "\r\nLe format de la ligne n'est pas respecté\r\n";
-		}
+		clientExisteDeja = Client.chercherClient(ligne) >= 0;
 
 		if (ligne.contains(" ") || clientExisteDeja) {
 			// Il y a une espace
-			sortie += "Erreur avec la ligne " + ligne + "\r\n";
-			sortie += ligne.contains(" ") ? "\tLa ligne contient plus qu'un nom\r\n" : "";
-			sortie += clientExisteDeja ? "\tLe client existe déjà.\r\n" : "";
-			
-		}else {
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += ligne.contains(" ") ? "\tLa ligne contient plus qu'un nom\r\n"
+					: "";
+			s += clientExisteDeja ? "\tLe client existe déjà.\r\n" : "";
+
+		} else {
 			new Client(ligne);
 		}
-
+		return s;
 	}
 
-	private static void lireLignePlat(String ligne) {
+	public static String lireLignePlat(String ligne) {
+		String s = "";
 		String[] platSplit = ligne.split(" ");
 		if (platSplit.length != 2) {
-			sortie += "Erreur avec la ligne " + ligne
+			s += "Erreur avec la ligne " + ligne
 					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
 		}
 		boolean platExisteDeja = false, prixValide = false;
@@ -170,20 +169,23 @@ public class Main {
 
 		if (platExisteDeja || !prixValide) {
 			// Il y a au moins une erreur;
-			sortie += "Erreur avec la ligne " + ligne + "\r\n";
-			sortie += platExisteDeja ? "\tLe plat existe déjà\r\n" : "";
-			sortie += !prixValide ? "\tLe prix n'est pas valide\r\n" : "";
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += platExisteDeja ? "\tLe plat existe déjà\r\n" : "";
+			s += !prixValide ? "\tLe prix n'est pas valide\r\n" : "";
 		} else {
 			// Aucune erreur, ajouter la commande
 			new Plat(platSplit[0], prix);
 		}
 
+		return s;
+
 	}
 
-	private static void lireLigneCommande(String ligne) {
+	public static String lireLigneCommande(String ligne) {
+		String s = "";
 		String[] commandesSplit = ligne.split(" ");
 		if (commandesSplit.length != 3) {
-			sortie += "Erreur avec la ligne " + ligne
+			s += "Erreur avec la ligne " + ligne
 					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
 		}
 
@@ -203,30 +205,30 @@ public class Main {
 				quantiteValide = false;
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
-			sortie += "Erreur avec la ligne " + ligne
+			s += "Erreur avec la ligne " + ligne
 					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
 		}
 
 		if (!clientExiste || !platExiste || !quantiteValide) {
 			// Il y a au moins une erreur;
-			sortie += "Erreur avec la ligne \"" + ligne + "\"\r\n";
-			sortie += !clientExiste ? "\tLe client n'existe pas\r\n" : "";
-			sortie += !platExiste ? "\tLe plat n'existe pas\r\n" : "";
-			sortie += !quantiteValide ? "\tLa quantité n'est pas valide\r\n"
-					: "";
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += !clientExiste ? "\tLe client n'existe pas\r\n" : "";
+			s += !platExiste ? "\tLe plat n'existe pas\r\n" : "";
+			s += !quantiteValide ? "\tLa quantité n'est pas valide\r\n" : "";
 		} else {
 			// Aucune erreur, ajouter la commande
 			Commande com = new Commande(Plat.getPlat(indexPlat), quantite);
 			Client.getClient(indexClient).ajouterCommande(com);
 		}
-
+		return s;
 	}
-	
+
 	// Écrit les commandes correctes dans le string sortie
-	private static void ecrireSortie(){
-		if(sortie.length() > 0)
-			sortie+="\r\n-------------------\r\n\r\n";
-		sortie+="Bienvenue chez Barette!\r\nFactures:\r\n" + Client.compilerFactures();
+	private static void ecrireSortie() {
+		if (sortie.length() > 0)
+			sortie += "\r\n-------------------\r\n\r\n";
+		sortie += "Bienvenue chez Barette!\r\nFactures:\r\n"
+				+ Client.compilerFactures();
 	}
 
 	private static void afficherSortie() {
