@@ -15,6 +15,8 @@ public class Commande {
 	public double calculerPrix(){
 		return plat.getPrix()*quantite;
 	}
-
-
+	
+	public int getQuantite() {
+		return quantite;
+	}
 }

@@ -22,7 +22,7 @@ public class Plat {
 		return nom;
 	}
 	
-	static int chercherPlat(String nom){
+	public static int chercherPlat(String nom){
 		int index = -1;
 		for (int i = 0; i < listePlats.size(); i++) {
 			if (listePlats.get(i).getNom().equals(nom)) {
@@ -33,7 +33,7 @@ public class Plat {
 		return index;
 	}
 	
-	static Plat getPlat(int index){
+	public static Plat getPlat(int index){
 		return listePlats.get(index);
 	}
 }

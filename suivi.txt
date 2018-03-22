@@ -1,4 +1,4 @@
-Werner Burat:
+﻿Werner Burat:
 Fonctionalités: 
 -Valider une commande (validerCommande)
 Réusinage:
@@ -13,3 +13,15 @@ Fonctionalités:
 
 Réusinage du code de la partie 2 à la partie 3:
 -Package "partie2" renommé "partie3"
+-Réorganisation des méthodes dans les objets Commande et Plat
+
+Tests faits
+Commande:
+testGetQuantite: obtenir la bonne quantité de plats dans la commande
+testCalculerPrix: calculer le prix d'une commande
+
+Plat:
+testChercherPlatExistant: Chercher si on plat existe dans la liste des plats
+testChercherPlatInexistant: Chercher si un plat qui n'existe pas retourne l'index -1
+testGetPrixPlat: Vérifier si le plat retourne son bon prix.
+testGetNomPlat: Vérifier si le plat retourne le bon nom.
