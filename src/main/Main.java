@@ -6,6 +6,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Main {
 
@@ -75,8 +78,13 @@ public class Main {
 			
 			ecrireSortie();
 			afficherSortie();
-
-			FileWriter ecriveurFichier = new FileWriter("sortie.txt");
+			String nomFichierSortie = "Facture-du-";
+			Calendar cal = Calendar.getInstance();
+		   
+		    
+		    nomFichierSortie +=  new SimpleDateFormat("dd-MMM-HH").format(cal.getTime()) + 'h' + new SimpleDateFormat("mm").format(cal.getTime());
+		    
+			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie + ".txt");
 			BufferedWriter ecriveurBuff = new BufferedWriter(ecriveurFichier);
 
 			ecrireFichierSortie(ecriveurBuff);
@@ -217,7 +225,9 @@ public class Main {
 	
 	// Écrit les commandes correctes dans le string sortie
 	private static void ecrireSortie(){
-		sortie+="\r\n-------------------\r\n\r\nBienvenue chez Barette!\r\nFactures:\r\n" + Client.compilerFactures();
+		if(sortie.length() > 0)
+			sortie+="\r\n-------------------\r\n\r\n";
+		sortie+="Bienvenue chez Barette!\r\nFactures:\r\n" + Client.compilerFactures();
 	}
 
 	private static void afficherSortie() {
