@@ -53,7 +53,10 @@ public class Client {
 	public static String compilerFactures(){
 		String sortie = "";
 		for (Client client : listeClients) {
-			sortie += client.getNom() + " : " + String.format("%.2f", client.calculerTotal())+ " $\r\n";
+			if (client.calculerTotal()>0) {
+				sortie += client.getNom() + " : " + String.format("%.2f", client.calculerTotal())+ " $\r\n";
+			}
+			
 		}
 		return sortie;
 		
