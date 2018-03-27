@@ -77,13 +77,9 @@ public class Main {
 
 			ecrireSortie();
 			afficherSortie();
-			String nomFichierSortie = "Facture-du-";
-			Calendar cal = Calendar.getInstance();
-
-			nomFichierSortie += new SimpleDateFormat("dd-MMM-HH").format(cal
-					.getTime())
-					+ 'h'
-					+ new SimpleDateFormat("mm").format(cal.getTime());
+			
+			//Création du nom de la facture
+			String nomFichierSortie = creationFacture();
 
 			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie
 					+ ".txt");
@@ -106,6 +102,17 @@ public class Main {
 			System.out
 					.println("Le fichier ne respecte pas le format demandé !");
 		}
+	}
+
+	private static String creationFacture() {
+		String nomFichierSortie = "Facture-du-";
+		Calendar cal = Calendar.getInstance();
+
+		nomFichierSortie += new SimpleDateFormat("dd-MMM-HH").format(cal
+				.getTime())
+				+ 'h'
+				+ new SimpleDateFormat("mm").format(cal.getTime());
+		return nomFichierSortie;
 	}
 
 	private static void lireCommandes(String[] lignes, int i3, int i4) {
