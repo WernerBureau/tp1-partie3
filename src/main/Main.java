@@ -6,24 +6,31 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.BufferedReader;
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Main {
 
-	static ArrayList<Client> clients = new ArrayList<Client>();
-	static ArrayList<Plat> plats = new ArrayList<Plat>();
-	static ArrayList<Commande> commandes = new ArrayList<Commande>();
+	static String nomFichier = "entree.txt";
+	static String sortie;
 
 	public static void main(String[] args) throws IOException {
 
 		// Lecture du fichier entree.txt
-		String nomFichier = "entree.txt";
+		lireFichier(nomFichier);
+
+	}
+
+	private static void lireFichier(String entree) {
+
 		String ligne = null;
 
 		String[] lignes = new String[30];
 		String[] texte;
 
 		try {
+
+			sortie = "";
 			FileReader liseurFichier = new FileReader(nomFichier);
 			BufferedReader liseurBuff = new BufferedReader(liseurFichier);
 
@@ -60,21 +67,29 @@ public class Main {
 			}
 
 			// Clients
-			ajoutClients(lignes, i1, i2);
+			lireClients(lignes, i1, i2);
 
 			// Plats
-			ajoutPlats(lignes, i2, i3);
+			lirePlats(lignes, i2, i3);
 
 			// Commandes
-			construireCommandes(lignes, i3, i4);
+			lireCommandes(lignes, i3, i4);
 
-			FileWriter ecriveurFichier = new FileWriter("sortie.txt");
+			ecrireSortie();
+			afficherSortie();
+			String nomFichierSortie = "Facture-du-";
+			Calendar cal = Calendar.getInstance();
+
+			nomFichierSortie += new SimpleDateFormat("dd-MMM-HH").format(cal
+					.getTime())
+					+ 'h'
+					+ new SimpleDateFormat("mm").format(cal.getTime());
+
+			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie
+					+ ".txt");
 			BufferedWriter ecriveurBuff = new BufferedWriter(ecriveurFichier);
 
-			// Affichage des commandes
-			afficherCommandes();
-
-			ecritureFichier(ecriveurBuff);
+			ecrireFichierSortie(ecriveurBuff);
 
 			ecriveurBuff.flush();
 			ecriveurBuff.close();
@@ -93,121 +108,136 @@ public class Main {
 		}
 	}
 
-	private static void ecritureFichier(BufferedWriter ecriveurBuff)
-			throws IOException {
-		ecriveurBuff.write("Bienvenue chez Barette!\r\nFactures:");
-		ecrireCommandes(ecriveurBuff);
-	}
-
-	private static void construireCommandes(String[] lignes, int i3, int i4) {
-		Client client;
+	private static void lireCommandes(String[] lignes, int i3, int i4) {
 		for (int i = 1; i < i4 - i3; i++) {
-
-			String[] commandesSplit = lignes[i3 + i].split(" ");
-			client = new Client(commandesSplit[0]);
-			int quantite = Integer.parseInt(commandesSplit[2]);
-
-			validerCommande(commandesSplit);
-			
-			// Attribuer un client à la commande
-			for (Commande com : commandes) {
-				if (com.getClient().getNom().equals(client.getNom())) {
-					// Attribuer des plats à la commande
-					for (Plat pl : plats) {
-						if (pl.getNom().equals(commandesSplit[1]))
-							com.ajouterPlat(pl, quantite);
-					}
-
-				}
-
-			}
-
+			sortie += lireLigneCommande(lignes[i3 + i]);
 		}
 	}
 
-	public static boolean validerCommande(String[] commandesSplit) {
-		boolean valide = true;
-		if (!clientExiste(commandesSplit[0])) {
-			valide = false;
-		}
-		if (!platExiste(commandesSplit[1])) {
-			valide = false;
-		}
-		return valide;
-	}
-
-	private static void ajoutPlats(String[] lignes, int i2, int i3) {
-		Plat plat;
+	private static void lirePlats(String[] lignes, int i2, int i3) {
 		for (int i = 1; i < i3 - i2; i++) {
-			String[] platSplit = lignes[i2 + i].split(" ");
-			plat = new Plat(platSplit[0], Double.parseDouble(platSplit[1]));
-			plats.add(plat);
+			sortie += lireLignePlat(lignes[i2 + i]);
 
 		}
 	}
 
-	private static void ajoutClients(String[] lignes, int i1, int i2) {
-		Client client;
-		Commande commande;
+	private static void lireClients(String[] lignes, int i1, int i2) {
 		for (int i = 1; i < i2 - i1; i++) {
-			client = new Client(lignes[i]);
-			clients.add(client);
-			commande = new Commande(client);
-			commandes.add(commande);
+			sortie += lireLigneClient(lignes[i]);
 		}
 	}
 
-	public static boolean clientExiste(String nom) {
+	public static String lireLigneClient(String ligne) {
 
-		boolean b = false;
-		for (Client cli : clients) {
-			if (cli.getNom().equals(nom)) {
-				b = true;
+		String s = "";
+		boolean clientExisteDeja = true;
+		clientExisteDeja = Client.chercherClient(ligne) >= 0;
+
+		if (ligne.contains(" ") || clientExisteDeja) {
+			// Il y a une espace
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += ligne.contains(" ") ? "\tLa ligne contient plus qu'un nom\r\n"
+					: "";
+			s += clientExisteDeja ? "\tLe client existe déjà.\r\n" : "";
+
+		} else {
+			new Client(ligne);
+		}
+		return s;
+	}
+
+	public static String lireLignePlat(String ligne) {
+		String s = "";
+		String[] platSplit = ligne.split(" ");
+		if (platSplit.length != 2) {
+			s += "Erreur avec la ligne " + ligne
+					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+		}
+		boolean platExisteDeja = false, prixValide = false;
+		double prix = 0;
+		try {
+
+			platExisteDeja = (Plat.chercherPlat(platSplit[0]) >= 0);
+			try {
+				prix = Double.parseDouble(platSplit[1]);
+				prixValide = true;
+			} catch (NumberFormatException ex) {
+				prixValide = false;
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
 		}
 
-		return b;
+		if (platExisteDeja || !prixValide) {
+			// Il y a au moins une erreur;
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += platExisteDeja ? "\tLe plat existe déjà\r\n" : "";
+			s += !prixValide ? "\tLe prix n'est pas valide\r\n" : "";
+		} else {
+			// Aucune erreur, ajouter la commande
+			new Plat(platSplit[0], prix);
+		}
+
+		return s;
 
 	}
 
-	public static boolean platExiste(String nom) {
+	public static String lireLigneCommande(String ligne) {
+		String s = "";
+		String[] commandesSplit = ligne.split(" ");
+		if (commandesSplit.length != 3) {
+			s += "Erreur avec la ligne " + ligne
+					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+		}
 
-		boolean b = false;
-		for (Plat plat : plats) {
-			if (plat.getNom().equals(nom)) {
-				b = true;
+		boolean clientExiste = false, platExiste = false, quantiteValide = false;
+		int quantite = 0, indexClient = 0, indexPlat = 0;
+
+		try {
+			indexClient = Client.chercherClient(commandesSplit[0]);
+			indexPlat = Plat.chercherPlat(commandesSplit[1]);
+			clientExiste = (indexClient >= 0);
+			platExiste = (indexPlat >= 0);
+
+			try {
+				quantite = Integer.parseInt(commandesSplit[2]);
+				quantiteValide = true;
+			} catch (NumberFormatException ex) {
+				quantiteValide = false;
 			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			s += "Erreur avec la ligne " + ligne
+					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
 		}
 
-		return b;
-
-	}
-
-	private static String genererSortie() {
-		String afficher = "";
-		for (Commande commande : commandes) {
-			commande.setErreur("");
-			if (!commande.getErreur().equals("")) {
-				afficher += commande + "\r\n";
-			}
+		if (!clientExiste || !platExiste || !quantiteValide) {
+			// Il y a au moins une erreur;
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += !clientExiste ? "\tLe client n'existe pas\r\n" : "";
+			s += !platExiste ? "\tLe plat n'existe pas\r\n" : "";
+			s += !quantiteValide ? "\tLa quantité n'est pas valide\r\n" : "";
+		} else {
+			// Aucune erreur, ajouter la commande
+			Commande com = new Commande(Plat.getPlat(indexPlat), quantite);
+			Client.getClient(indexClient).ajouterCommande(com);
 		}
-
-		for (Commande commande : commandes) {
-			if (commande.getErreur().equals("")
-					&& commande.calculerPrixTotal() != 0) {
-				afficher += commande + "\r\n";
-			}
-		}
-		return afficher;
+		return s;
 	}
 
-	public static void afficherCommandes() {
-		System.out.println(genererSortie());
+	// Écrit les commandes correctes dans le string sortie
+	private static void ecrireSortie() {
+		if (sortie.length() > 0)
+			sortie += "\r\n-------------------\r\n\r\n";
+		sortie += "Bienvenue chez Barette!\r\nFactures:\r\n"
+				+ Client.compilerFactures();
 	}
 
-	private static void ecrireCommandes(BufferedWriter ecriveurBuff)
+	private static void afficherSortie() {
+		System.out.println(sortie);
+	}
+
+	private static void ecrireFichierSortie(BufferedWriter ecriveurBuff)
 			throws IOException {
-		ecriveurBuff.write(genererSortie());
+		ecriveurBuff.write(sortie);
 	}
 
 }
