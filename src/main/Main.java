@@ -135,21 +135,48 @@ public class Main {
 	}
 
 	public static String lireLigneClient(String ligne) {
-
+		
 		String s = "";
 		boolean clientExisteDeja = true;
+		boolean clientContientTable = false;
+		String clientNom = "";
+		int clientTable = 0;
 		clientExisteDeja = Client.chercherClient(ligne) >= 0;
 
-		if (ligne.contains(" ") || clientExisteDeja) {
-			// Il y a une espace
-			s += "Erreur avec la ligne " + ligne + "\r\n";
-			s += ligne.contains(" ") ? "\tLa ligne contient plus qu'un nom\r\n"
-					: "";
-			s += clientExisteDeja ? "\tLe client existe déjà.\r\n" : "";
-
-		} else {
-			new Client(ligne);
+		//Vérifier si la ligne client contient une table
+		for (char c : ligne.toCharArray()) {
+			if(Character.isDigit(c)){
+				clientContientTable = true;
+			}
 		}
+		
+		// Il y a un espace
+		if (clientExisteDeja) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLe client existe déjà.\r\n";
+		} 
+		else if (!clientContientTable) {
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += "\tLe client ne fait pas partie d'une table.\r\n";
+		}
+		else {
+			try {
+				String[] clientInfos = ligne.split(" ");
+				clientNom = clientInfos[0];
+				clientTable = Integer.parseInt(clientInfos[1]);
+				if (clientInfos.length ==  2){
+					new Client(clientNom, clientTable);
+				} else {
+					throw new ArrayIndexOutOfBoundsException();
+				}
+			} catch (Exception e) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLe format de la ligne n'est pas respecté\r\n";
+			}
+			
+			
+		}
+		
 		return s;
 	}
 
