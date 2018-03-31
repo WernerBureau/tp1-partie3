@@ -4,25 +4,22 @@ import java.util.ArrayList;
 
 public class Client {
 	private String nom;
-	private int numeroTable;
 	private ArrayList<Commande> commandes;
 	
 	static ArrayList<Client> listeClients = new ArrayList<Client>();
 	
 	public Client(String nom, int numeroTable) {
 		this.nom = nom;
-		this.numeroTable = numeroTable;
 		this.commandes = new ArrayList<Commande>();
+		Table.ajouterClient(this, numeroTable);
 		listeClients.add(this);
+		
 	}
 
 	public String getNom() {
 		return nom;
 	}
 	
-	public int getNumeroTable() {
-		return numeroTable;
-	}
 
 	public void setNom(String nom) {
 		this.nom = nom;
