@@ -44,5 +44,23 @@ public class Table {
 	public void setNoTable(int noTable) {
 		this.noTable = noTable;
 	}
-
+	
+	public static String compilerFactures(){
+		String sortie = "";
+		for (Table table : listeTables) {
+			double totalTable = 0;
+			int noTable = table.getNoTable();
+			
+			for (Client client : table.clients) {
+				if (client.calculerTotal() > 0)
+					totalTable += client.calculerTotal();
+			}
+			if (table.clients.size() >= 3 || totalTable >= 100)
+				totalTable *= 1.15;
+			
+			sortie += "Table " + noTable + ": " + String.format("%.2f",totalTable)+ " $\r\n";
+		}
+		
+		return sortie;
+	}
 }

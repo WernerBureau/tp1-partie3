@@ -262,7 +262,7 @@ public class Main {
 		if (sortie.length() > 0)
 			sortie += "\r\n-------------------\r\n\r\n";
 		sortie += "Bienvenue chez Barette!\r\nFactures:\r\n"
-				+ Client.compilerFactures();
+				+ Table.compilerFactures();
 	}
 
 	private static void afficherSortie() {

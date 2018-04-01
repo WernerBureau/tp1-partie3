@@ -53,15 +53,5 @@ public class Client {
 		return listeClients.get(index);
 	}
 	
-	public static String compilerFactures(){
-		String sortie = "";
-		for (Client client : listeClients) {
-			if (client.calculerTotal()>0) {
-				sortie += client.getNom() + " : " + String.format("%.2f", client.calculerTotal())+ " $\r\n";
-			}
-			
-		}
-		return sortie;
-		
-	}
+
 }

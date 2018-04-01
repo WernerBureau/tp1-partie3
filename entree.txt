@@ -1,13 +1,17 @@
 Clients :
 Roger 1
+Hubert 1
 Céline 2
-Steeve 1
+Steeve 2
+Maxime 2
 Plats :
 Poutine 10.5
 Frites 2.5
 Repas_Poulet 15.75
 Commandes :
 Roger Poutine 1
-Céline Frites 2
-Céline Repas_Poulet 1
+Hubert Repas_Poulet 1
+Céline Frites 1
+Steeve Poutine 1
+Maxime Poutine 1
 Fin
