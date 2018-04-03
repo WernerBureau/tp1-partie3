@@ -151,11 +151,14 @@ public class Main {
 		}
 		
 		// Il y a un espace
+		/*
 		if (clientExisteDeja) {
 				s += "Erreur avec la ligne " + ligne + "\r\n";
 				s += "\tLe client existe déjà.\r\n";
 		} 
-		else if (!clientContientTable) {
+		*/
+		
+		if (!clientContientTable) {
 			s += "Erreur avec la ligne " + ligne + "\r\n";
 			s += "\tLe client ne fait pas partie d'une table.\r\n";
 		}
@@ -163,18 +166,36 @@ public class Main {
 			try {
 				String[] clientInfos = ligne.split(" ");
 				clientNom = clientInfos[0];
-				clientTable = Integer.parseInt(clientInfos[1]);
-				if (clientInfos.length ==  2){
-					new Client(clientNom, clientTable);
+				try {
+					clientTable = Integer.parseInt(clientInfos[1]);
+				} catch (Exception e) {
+					s += "Erreur avec la ligne " + ligne + "\r\n";
+					s += "\tLe format de la table n'est pas respecté\r\n";
+				}
+				
+				clientExisteDeja = Client.chercherClient(clientInfos[0]) >= 0;
+				if (clientExisteDeja) {
+					throw new IndexOutOfBoundsException();
+				} 
+				
+				if (clientInfos.length == 2){
+					if (! (clientTable < 100 && clientTable > 0))
+						throw new NumberFormatException();
+					else
+						new Client(clientNom, clientTable);
 				} else {
 					throw new ArrayIndexOutOfBoundsException();
 				}
-			} catch (Exception e) {
+			} catch (ArrayIndexOutOfBoundsException e) {
 				s += "Erreur avec la ligne " + ligne + "\r\n";
 				s += "\tLe format de la ligne n'est pas respecté\r\n";
+			} catch (NumberFormatException e) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLa table n'est pas un nombre valide (entre 1 et 99)\r\n";
+			} catch (IndexOutOfBoundsException e) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLe client existe déjà.\r\n";
 			}
-			
-			
 		}
 		
 		return s;
