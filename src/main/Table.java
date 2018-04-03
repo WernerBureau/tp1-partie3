@@ -56,6 +56,8 @@ public class Table {
 					totalTable += client.calculerTotal();
 			}
 			if (table.clients.size() >= 3 || totalTable >= 100)
+				totalTable *= 1.30;
+			else
 				totalTable *= 1.15;
 			
 			sortie += "Table " + noTable + ": " + String.format("%.2f",totalTable)+ " $\r\n";

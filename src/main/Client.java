@@ -34,7 +34,7 @@ public class Client {
 		for (Commande commande : commandes) {
 			total += commande.calculerPrix();
 		}
-		return total *=1.15;
+		return total;
 		
 	}
 	
