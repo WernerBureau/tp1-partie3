@@ -42,7 +42,7 @@ public class Main {
 			}
 			liseurBuff.close();
 
-			// Création d'un nouveau tableau ayant la longueur du nombre de
+			// CrÃ©ation d'un nouveau tableau ayant la longueur du nombre de
 			// lignes.
 			texte = new String[indice];
 
@@ -78,7 +78,7 @@ public class Main {
 			ecrireSortie();
 			afficherSortie();
 			
-			//Création du nom de la facture
+			//CrÃ©ation du nom de la facture
 			String nomFichierSortie = creationFacture();
 
 			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie
@@ -100,7 +100,7 @@ public class Main {
 					+ nomFichier + "'");
 		} catch (ArrayIndexOutOfBoundsException ex) {
 			System.out
-					.println("Le fichier ne respecte pas le format demandé !");
+					.println("Le fichier ne respecte pas le format demandÃ© !");
 		}
 	}
 
@@ -143,7 +143,7 @@ public class Main {
 		int clientTable = 0;
 		clientExisteDeja = Client.chercherClient(ligne) >= 0;
 
-		//Vérifier si la ligne client contient une table
+		//VÃ©rifier si la ligne client contient une table
 		for (char c : ligne.toCharArray()) {
 			if(Character.isDigit(c)){
 				clientContientTable = true;
@@ -154,7 +154,7 @@ public class Main {
 		/*
 		if (clientExisteDeja) {
 				s += "Erreur avec la ligne " + ligne + "\r\n";
-				s += "\tLe client existe déjà.\r\n";
+				s += "\tLe client existe dÃ©jÃ .\r\n";
 		} 
 		*/
 		
@@ -170,7 +170,7 @@ public class Main {
 					clientTable = Integer.parseInt(clientInfos[1]);
 				} catch (Exception e) {
 					s += "Erreur avec la ligne " + ligne + "\r\n";
-					s += "\tLe format de la table n'est pas respecté\r\n";
+					s += "\tLe format de la table n'est pas respectÃ©\r\n";
 				}
 				
 				clientExisteDeja = Client.chercherClient(clientInfos[0]) >= 0;
@@ -188,13 +188,13 @@ public class Main {
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {
 				s += "Erreur avec la ligne " + ligne + "\r\n";
-				s += "\tLe format de la ligne n'est pas respecté\r\n";
+				s += "\tLe format de la ligne n'est pas respectÃ©\r\n";
 			} catch (NumberFormatException e) {
 				s += "Erreur avec la ligne " + ligne + "\r\n";
 				s += "\tLa table n'est pas un nombre valide (entre 1 et 99)\r\n";
 			} catch (IndexOutOfBoundsException e) {
 				s += "Erreur avec la ligne " + ligne + "\r\n";
-				s += "\tLe client existe déjà.\r\n";
+				s += "\tLe client existe dÃ©jÃ .\r\n";
 			}
 		}
 		
@@ -206,7 +206,7 @@ public class Main {
 		String[] platSplit = ligne.split(" ");
 		if (platSplit.length != 2) {
 			s += "Erreur avec la ligne " + ligne
-					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+					+ "\r\n\tLe format de la ligne n'est pas respectÃ©\r\n";
 		}
 		boolean platExisteDeja = false, prixValide = false;
 		double prix = 0;
@@ -225,7 +225,7 @@ public class Main {
 		if (platExisteDeja || !prixValide) {
 			// Il y a au moins une erreur;
 			s += "Erreur avec la ligne " + ligne + "\r\n";
-			s += platExisteDeja ? "\tLe plat existe déjà\r\n" : "";
+			s += platExisteDeja ? "\tLe plat existe dÃ©jÃ \r\n" : "";
 			s += !prixValide ? "\tLe prix n'est pas valide\r\n" : "";
 		} else {
 			// Aucune erreur, ajouter la commande
@@ -241,7 +241,7 @@ public class Main {
 		String[] commandesSplit = ligne.split(" ");
 		if (commandesSplit.length != 3) {
 			s += "Erreur avec la ligne " + ligne
-					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+					+ "\r\n\tLe format de la ligne n'est pas respectÃ©\r\n";
 		}
 
 		boolean clientExiste = false, platExiste = false, quantiteValide = false;
@@ -261,7 +261,7 @@ public class Main {
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			s += "Erreur avec la ligne " + ligne
-					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+					+ "\r\n\tLe format de la ligne n'est pas respectÃ©\r\n";
 		}
 
 		if (!clientExiste || !platExiste || !quantiteValide) {
@@ -269,7 +269,7 @@ public class Main {
 			s += "Erreur avec la ligne " + ligne + "\r\n";
 			s += !clientExiste ? "\tLe client n'existe pas\r\n" : "";
 			s += !platExiste ? "\tLe plat n'existe pas\r\n" : "";
-			s += !quantiteValide ? "\tLa quantité n'est pas valide\r\n" : "";
+			s += !quantiteValide ? "\tLa quantitÃ© n'est pas valide\r\n" : "";
 		} else {
 			// Aucune erreur, ajouter la commande
 			Commande com = new Commande(Plat.getPlat(indexPlat), quantite);
@@ -278,7 +278,7 @@ public class Main {
 		return s;
 	}
 
-	// Écrit les commandes correctes dans le string sortie
+	// Ã‰crit les commandes correctes dans le string sortie
 	private static void ecrireSortie() {
 		if (sortie.length() > 0)
 			sortie += "\r\n-------------------\r\n\r\n";

@@ -13,7 +13,6 @@ public class Client {
 		this.commandes = new ArrayList<Commande>();
 		Table.ajouterClient(this, numeroTable);
 		listeClients.add(this);
-		
 	}
 
 	public String getNom() {
@@ -52,6 +51,4 @@ public class Client {
 	public static Client getClient(int index){
 		return listeClients.get(index);
 	}
-	
-
 }
