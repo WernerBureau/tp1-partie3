@@ -42,7 +42,7 @@ public class Main {
 			}
 			liseurBuff.close();
 
-			// Création d'un nouveau tableau ayant la longueur du nombre de
+			// CrÃ©ation d'un nouveau tableau ayant la longueur du nombre de
 			// lignes.
 			texte = new String[indice];
 
@@ -77,13 +77,9 @@ public class Main {
 
 			ecrireSortie();
 			afficherSortie();
-			String nomFichierSortie = "Facture-du-";
-			Calendar cal = Calendar.getInstance();
-
-			nomFichierSortie += new SimpleDateFormat("dd-MMM-HH").format(cal
-					.getTime())
-					+ 'h'
-					+ new SimpleDateFormat("mm").format(cal.getTime());
+			
+			//CrÃ©ation du nom de la facture
+			String nomFichierSortie = creationFacture();
 
 			FileWriter ecriveurFichier = new FileWriter(nomFichierSortie
 					+ ".txt");
@@ -104,8 +100,19 @@ public class Main {
 					+ nomFichier + "'");
 		} catch (ArrayIndexOutOfBoundsException ex) {
 			System.out
-					.println("Le fichier ne respecte pas le format demandé !");
+					.println("Le fichier ne respecte pas le format demandÃ© !");
 		}
+	}
+
+	private static String creationFacture() {
+		String nomFichierSortie = "Facture-du-";
+		Calendar cal = Calendar.getInstance();
+
+		nomFichierSortie += new SimpleDateFormat("dd-MMM-HH").format(cal
+				.getTime())
+				+ 'h'
+				+ new SimpleDateFormat("mm").format(cal.getTime());
+		return nomFichierSortie;
 	}
 
 	private static void lireCommandes(String[] lignes, int i3, int i4) {
@@ -128,21 +135,69 @@ public class Main {
 	}
 
 	public static String lireLigneClient(String ligne) {
-
+		
 		String s = "";
 		boolean clientExisteDeja = true;
+		boolean clientContientTable = false;
+		String clientNom = "";
+		int clientTable = 0;
 		clientExisteDeja = Client.chercherClient(ligne) >= 0;
 
-		if (ligne.contains(" ") || clientExisteDeja) {
-			// Il y a une espace
-			s += "Erreur avec la ligne " + ligne + "\r\n";
-			s += ligne.contains(" ") ? "\tLa ligne contient plus qu'un nom\r\n"
-					: "";
-			s += clientExisteDeja ? "\tLe client existe déjà.\r\n" : "";
-
-		} else {
-			new Client(ligne);
+		//VÃ©rifier si la ligne client contient une table
+		for (char c : ligne.toCharArray()) {
+			if(Character.isDigit(c)){
+				clientContientTable = true;
+			}
 		}
+		
+		// Il y a un espace
+		/*
+		if (clientExisteDeja) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLe client existe dÃ©jÃ .\r\n";
+		} 
+		*/
+		
+		if (!clientContientTable) {
+			s += "Erreur avec la ligne " + ligne + "\r\n";
+			s += "\tLe client ne fait pas partie d'une table.\r\n";
+		}
+		else {
+			try {
+				String[] clientInfos = ligne.split(" ");
+				clientNom = clientInfos[0];
+				try {
+					clientTable = Integer.parseInt(clientInfos[1]);
+				} catch (Exception e) {
+					s += "Erreur avec la ligne " + ligne + "\r\n";
+					s += "\tLe format de la table n'est pas respectÃ©\r\n";
+				}
+				
+				clientExisteDeja = Client.chercherClient(clientInfos[0]) >= 0;
+				if (clientExisteDeja) {
+					throw new IndexOutOfBoundsException();
+				} 
+				
+				if (clientInfos.length == 2){
+					if (! (clientTable < 100 && clientTable > 0))
+						throw new NumberFormatException();
+					else
+						new Client(clientNom, clientTable);
+				} else {
+					throw new ArrayIndexOutOfBoundsException();
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLe format de la ligne n'est pas respectÃ©\r\n";
+			} catch (NumberFormatException e) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLa table n'est pas un nombre valide (entre 1 et 99)\r\n";
+			} catch (IndexOutOfBoundsException e) {
+				s += "Erreur avec la ligne " + ligne + "\r\n";
+				s += "\tLe client existe dÃ©jÃ .\r\n";
+			}
+		}
+		
 		return s;
 	}
 
@@ -151,7 +206,7 @@ public class Main {
 		String[] platSplit = ligne.split(" ");
 		if (platSplit.length != 2) {
 			s += "Erreur avec la ligne " + ligne
-					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+					+ "\r\n\tLe format de la ligne n'est pas respectÃ©\r\n";
 		}
 		boolean platExisteDeja = false, prixValide = false;
 		double prix = 0;
@@ -170,7 +225,7 @@ public class Main {
 		if (platExisteDeja || !prixValide) {
 			// Il y a au moins une erreur;
 			s += "Erreur avec la ligne " + ligne + "\r\n";
-			s += platExisteDeja ? "\tLe plat existe déjà\r\n" : "";
+			s += platExisteDeja ? "\tLe plat existe dÃ©jÃ \r\n" : "";
 			s += !prixValide ? "\tLe prix n'est pas valide\r\n" : "";
 		} else {
 			// Aucune erreur, ajouter la commande
@@ -186,7 +241,7 @@ public class Main {
 		String[] commandesSplit = ligne.split(" ");
 		if (commandesSplit.length != 3) {
 			s += "Erreur avec la ligne " + ligne
-					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+					+ "\r\n\tLe format de la ligne n'est pas respectÃ©\r\n";
 		}
 
 		boolean clientExiste = false, platExiste = false, quantiteValide = false;
@@ -206,7 +261,7 @@ public class Main {
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			s += "Erreur avec la ligne " + ligne
-					+ "\r\n\tLe format de la ligne n'est pas respecté\r\n";
+					+ "\r\n\tLe format de la ligne n'est pas respectÃ©\r\n";
 		}
 
 		if (!clientExiste || !platExiste || !quantiteValide) {
@@ -214,7 +269,7 @@ public class Main {
 			s += "Erreur avec la ligne " + ligne + "\r\n";
 			s += !clientExiste ? "\tLe client n'existe pas\r\n" : "";
 			s += !platExiste ? "\tLe plat n'existe pas\r\n" : "";
-			s += !quantiteValide ? "\tLa quantité n'est pas valide\r\n" : "";
+			s += !quantiteValide ? "\tLa quantitÃ© n'est pas valide\r\n" : "";
 		} else {
 			// Aucune erreur, ajouter la commande
 			Commande com = new Commande(Plat.getPlat(indexPlat), quantite);
@@ -223,12 +278,12 @@ public class Main {
 		return s;
 	}
 
-	// Écrit les commandes correctes dans le string sortie
+	// Ã‰crit les commandes correctes dans le string sortie
 	private static void ecrireSortie() {
 		if (sortie.length() > 0)
 			sortie += "\r\n-------------------\r\n\r\n";
 		sortie += "Bienvenue chez Barette!\r\nFactures:\r\n"
-				+ Client.compilerFactures();
+				+ Table.compilerFactures();
 	}
 
 	private static void afficherSortie() {

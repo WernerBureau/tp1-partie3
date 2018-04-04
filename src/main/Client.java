@@ -8,15 +8,17 @@ public class Client {
 	
 	static ArrayList<Client> listeClients = new ArrayList<Client>();
 	
-	public Client(String nom) {
+	public Client(String nom, int numeroTable) {
 		this.nom = nom;
 		this.commandes = new ArrayList<Commande>();
+		Table.ajouterClient(this, numeroTable);
 		listeClients.add(this);
 	}
 
 	public String getNom() {
 		return nom;
 	}
+	
 
 	public void setNom(String nom) {
 		this.nom = nom;
@@ -31,7 +33,7 @@ public class Client {
 		for (Commande commande : commandes) {
 			total += commande.calculerPrix();
 		}
-		return total *=1.15;
+		return total;
 		
 	}
 	
@@ -48,17 +50,5 @@ public class Client {
 	
 	public static Client getClient(int index){
 		return listeClients.get(index);
-	}
-	
-	public static String compilerFactures(){
-		String sortie = "";
-		for (Client client : listeClients) {
-			if (client.calculerTotal()>0) {
-				sortie += client.getNom() + " : " + String.format("%.2f", client.calculerTotal())+ " $\r\n";
-			}
-			
-		}
-		return sortie;
-		
 	}
 }
